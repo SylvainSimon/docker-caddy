@@ -1,0 +1,4 @@
+hello-world-nginx.caddy.test {
+	reverse_proxy nginx
+	tls /root/certs/hello-world-nginx.caddy.test.crt /root/certs/hello-world-nginx.caddy.test.key
+}

@@ -1,0 +1,9 @@
+hello-world.caddy.test:80 {
+
+    root /var/www/hello-world.caddy.test/public/
+    encode zstd br gzip
+
+    php_server {
+        #worker /path/to/your/worker.php
+    }
+}

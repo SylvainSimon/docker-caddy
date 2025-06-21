@@ -1,0 +1,7 @@
+import reverse-proxy/apache-reverse-proxy.Caddyfile
+import reverse-proxy/nginx-reverse-proxy.Caddyfile
+
+:443 {
+	reverse_proxy frankenphp-8.4
+	tls /root/certs/hello-world.caddy.test.crt /root/certs/hello-world.caddy.test.key
+}

@@ -1,0 +1,4 @@
+hello-world-apache.caddy.test {
+	reverse_proxy apache-2.4
+	tls /root/certs/hello-world-apache.caddy.test.crt /root/certs/hello-world-apache.caddy.test.key
+}

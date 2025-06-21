@@ -1,0 +1,96 @@
+services:
+    caddy:
+        container_name: 'sylvanus-caddy'
+        build:
+            context: .
+            dockerfile: caddy/Dockerfile
+        restart: always
+        ports:
+            - "80:80"
+            - "443:443"
+            - "443:443/udp"
+        volumes:
+            -   type: bind
+                source: $PWD/caddy/conf
+                target: /etc/caddy
+            -   type: bind
+                source: $PWD/../projects
+                target: /var/www
+            -   type: bind
+                source: $PWD/setup/certificates
+                target: /root/certs
+        links:
+            - php-8.4-fpm
+
+    nginx:
+        container_name: 'sylvanus-nginx'
+        build:
+            context: .
+            dockerfile: nginx/Dockerfile
+        restart: always
+        working_dir: /var/www
+        volumes:
+            -   type: bind
+                source: $PWD/nginx/conf
+                target: /etc/nginx/conf.d
+            -   type: bind
+                source: $PWD/../projects
+                target: /var/www
+        links:
+            - php-8.4-fpm
+
+    apache-2.4:
+        container_name: 'gpa-apache-2.4'
+        build:
+            context: .
+            dockerfile: apache-2.4/Dockerfile
+        restart: always
+        volumes:
+            -   type: bind
+                source: $PWD/apache-2.4/conf/httpd.conf
+                target: /usr/local/apache2/conf/httpd.conf
+            -   type: bind
+                source: $PWD/apache-2.4/sites-available
+                target: /etc/apache/sites-available
+            -   type: bind
+                source: $PWD/../projects
+                target: /var/www
+        links:
+            - php-8.4-fpm
+
+    php-8.4-fpm:
+        container_name: 'sylvanus-php-8.4-fpm'
+        build:
+            context: .
+            dockerfile: php-8.4-fpm/Dockerfile
+            args:
+                - UID=${UID}
+        restart: always
+        working_dir: /var/www
+        user: "${UID}:${GID}"
+        volumes:
+            -   type: bind
+                source: $PWD/../projects
+                target: /var/www
+            -   type: bind
+                source: $PWD/php-8.4-fpm/conf
+                target: /usr/local/etc/php/conf.d
+
+    frankenphp-8.4:
+        container_name: 'sylvanus-frankenphp-8.4'
+        build:
+            context: .
+            dockerfile: frankenphp/8.4/Dockerfile
+        restart: always
+        environment:
+            SERVER_NAME: :80
+        volumes:
+            -   type: bind
+                source: $PWD/frankenphp/caddy-conf/
+                target: /etc/frankenphp/Caddyfile.d/
+            -   type: bind
+                source: $PWD/../projects
+                target: /var/www
+            -   type: bind
+                source: $PWD/setup/certificates
+                target: /root/certs
